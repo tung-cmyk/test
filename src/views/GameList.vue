@@ -19,7 +19,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { supabase } from "/home/ttran/projects/test/vue-project/src/supabase.js";
+import { supabase } from "../supabase.js";
 
 const games = ref([]);
 const loading = ref(true);
