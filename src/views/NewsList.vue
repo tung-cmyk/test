@@ -7,12 +7,17 @@
 
     <div v-else>
       <div v-for="article in news" :key="article.id" class="news-card">
-        <h3>{{ article.title }}</h3>
+        <h3 class="article-titel">{{ article.title }}</h3>
         <p>{{ article.content }}</p>
         <p class="meta">
           Von {{ article.author }} am {{ article.published_at }}
         </p>
-        <p><strong>Tags:</strong> {{ article.tags?.join(", ") }}</p>
+        <p v-if="article.tags.length">
+          <strong>Tags:</strong>
+          <span v-for="tag in article.tags" :key="tag" class="tag">
+            {{ tag }}
+          </span>
+        </p>
       </div>
     </div>
   </div>
@@ -37,15 +42,16 @@ onMounted(async () => {
   }
 
   loading.value = false;
+  console.log("news: ", news.value[0].tags);
 });
 </script>
 
 <style scoped>
 .news-card {
-  border: 1px solid #ddd;
+  border: 1px solid #000000;
   padding: 1rem;
   margin-bottom: 1rem;
-  background: #fff;
+  background: #000000;
   border-radius: 6px;
 }
 .meta {

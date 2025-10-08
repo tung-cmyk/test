@@ -9,7 +9,7 @@
       <div v-for="game in games" :key="game.id" class="game-card">
         <h3>{{ game.name }}</h3>
         <p><strong>Genre:</strong> {{ game.genre }}</p>
-        <p><strong>Plattformen:</strong> {{ game.platforms.join(", ") }}</p>
+        <!--       <p><strong>Plattformen:</strong> {{ game.platforms.join(", ") }}</p>-->
         <p><strong>Release:</strong> {{ game.release_date }}</p>
         <p><strong>Entwickler:</strong> {{ game.developer }}</p>
       </div>
@@ -41,10 +41,10 @@ onMounted(async () => {
 
 <style scoped>
 .game-card {
-  border: 1px solid #ccc;
+  border: 1px solid #000000;
   padding: 1rem;
   margin-bottom: 1rem;
-  background: #f5f5f5;
+  background: #000000;
   border-radius: 6px;
 }
 </style>
