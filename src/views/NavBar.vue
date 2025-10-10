@@ -22,10 +22,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(to right, #0a0a0a, #0f0f10);
+  background: linear-gradient(
+    to right,
+    var(--color-background),
+    var(--color-background-dark)
+  );
   padding: 12px 24px;
-  color: white;
-  font-family: "Segoe UI", sans-serif;
+  color: var(--color-text);
+  font-family: var(--font-main);
 }
 
 .logo {
@@ -34,17 +38,21 @@
 }
 
 .icon {
-  background: linear-gradient(to right, #a200ff, #00f6ff);
-  color: white;
+  background: linear-gradient(
+    to right,
+    #a100ff,
+    #00cfff
+  ); /* kannst du auch als Variable setzen */
+  color: var(--color-text);
   font-weight: bold;
   font-size: 1rem;
   width: 32px;
   height: 32px;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 10px;
+  margin-right: var(--gap-sm);
 }
 
 .brand {
@@ -54,37 +62,37 @@
 .right-section {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: var(--gap-lg);
 }
 
 .nav-links {
   display: flex;
-  gap: 16px;
+  gap: var(--gap-md);
 }
 
 .nav-links a {
-  color: #cfcfcf;
+  color: var(--color-muted);
   text-decoration: none;
-  font-size: 0.95rem;
+  font-size: var(--font-size-base);
   transition: color 0.2s ease-in-out;
 }
 
 .nav-links a:hover {
-  color: white;
+  color: var(--color-text);
 }
 
 .subscribe-button {
-  background: #a200ff;
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-text);
   border: none;
   padding: 8px 16px;
-  font-size: 0.95rem;
+  font-size: var(--font-size-base);
   font-weight: bold;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   cursor: pointer;
 }
 
 .subscribe-button:hover {
-  background: #a200ff;
+  background: var(--color-primary-hover);
 }
 </style>

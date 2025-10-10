@@ -1,0 +1,22 @@
+:root {
+    /* Farben */
+  --color-primary: hsl(278, 100%, 50%);
+  --color-secondary: hsl(182, 100%, 50%);
+  --color-primary-hover: hsl(278, 100%, 50%);
+  --color-background: hsl(0, 0%, 4%);
+  --color-background-dark: hsl(240, 3.2%, 6.1%);
+  --color-text: hsl(0, 0%, 100%);
+  --color-muted: hsl(0, 0%, 81%);
+  --border-radius: 8px;
+  --font-main: 'Segoe UI', sans-serif;
+
+    /* Schriftart */
+  --font-main: 'Segoe UI', sans-serif;
+
+    /* Abstände und Radius */
+  --border-radius: 8px;
+  --font-size-base: 0.95rem;
+  --gap-sm: 10px;
+  --gap-md: 16px;
+  --gap-lg: 24px;
+}

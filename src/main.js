@@ -6,6 +6,7 @@ import InputText from 'primevue/inputtext';
 import Message from 'primevue/message';
 import Button from 'primevue/button';
 import { Form } from '@primevue/forms';
+import './assets/styles/variables.css';
 
 
 
