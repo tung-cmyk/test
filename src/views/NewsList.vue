@@ -12,12 +12,10 @@
         <p class="meta">
           Von {{ article.author }} am {{ article.published_at }}
         </p>
-        <p v-if="article.tags.length">
-          <strong>Tags:</strong>
-          <span v-for="tag in article.tags" :key="tag" class="tag">
-            {{ tag }}
-          </span>
-        </p>
+        <strong>Tags:</strong>
+        <span v-for="name in article.tags" :key="name" class="tag">
+          {{ name }}
+        </span>
       </div>
     </div>
   </div>
