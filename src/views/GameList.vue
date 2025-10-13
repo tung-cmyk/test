@@ -42,7 +42,7 @@ onMounted(async () => {
 .games {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1rem; /* spacing between columns and rows */
+  gap: 1rem;
   padding: 1rem;
 }
 
@@ -61,7 +61,6 @@ onMounted(async () => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
 }
 
-/* Make it responsive */
 @media (max-width: 900px) {
   .games {
     grid-template-columns: repeat(2, 1fr);
