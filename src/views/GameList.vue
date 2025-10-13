@@ -38,13 +38,39 @@ onMounted(async () => {
   loading.value = false;
 });
 </script>
-
 <style scoped>
-.game-card {
-  border: 1px solid #000000;
+.games {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem; /* spacing between columns and rows */
   padding: 1rem;
-  margin-bottom: 1rem;
-  background: #000000;
+}
+
+.game-card {
+  border: 1px solid #333;
+  padding: 1rem;
+  background: #111;
   border-radius: 6px;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.game-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* Make it responsive */
+@media (max-width: 900px) {
+  .games {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .games {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
