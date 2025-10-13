@@ -12,6 +12,9 @@
         <!--       <p><strong>Plattformen:</strong> {{ game.platforms.join(", ") }}</p>-->
         <p><strong>Release:</strong> {{ game.release_date }}</p>
         <p><strong>Entwickler:</strong> {{ game.developer }}</p>
+        <span v-for="tags in game.tags" :key="tags" class="tag">
+          {{ game.tags }}
+        </span>
       </div>
     </div>
   </div>
@@ -26,7 +29,9 @@ const loading = ref(true);
 const error = ref(null);
 
 onMounted(async () => {
-  const { data, error: fetchError } = await supabase.from("games").select("*");
+  const { data, error: fetchError } = await supabase
+    .from("games")
+    .select(`*,game_tags ( tags (*) `);
 
   if (fetchError) {
     error.value = "Fehler beim Laden der Spiele.";
