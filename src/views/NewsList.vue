@@ -7,15 +7,18 @@
 
     <div v-else>
       <div v-for="article in news" :key="article.id" class="news-card">
-        <h3 class="article-titel">{{ article.title }}</h3>
+        <h3 class="article-title">{{ article.title }}</h3>
         <p>{{ article.content }}</p>
         <p class="meta">
           Von {{ article.author }} am {{ article.published_at }}
         </p>
-        <strong>Tags:</strong>
-        <span v-for="name in article.tags" :key="name" class="tag">
-          {{ name }}
-        </span>
+
+        <div class="tags">
+          <strong>Tags:</strong>
+          <span v-for="tagName in article.tags" :key="tagName" class="tag">
+            {{ tagName }}
+          </span>
+        </div>
       </div>
     </div>
   </div>
@@ -30,30 +33,72 @@ const loading = ref(true);
 const error = ref(null);
 
 onMounted(async () => {
-  const { data, error: fetchError } = await supabase.from("news").select("*");
+  const { data: newsData, error: newsError } = await supabase
+    .from("news")
+    .select("*");
 
-  if (fetchError) {
-    error.value = "Fehler beim Laden der News.";
-    console.error(fetchError);
+  const { data: tagsData, error: tagsError } = await supabase
+    .from("tags")
+    .select("id, name");
+
+  if (newsError || tagsError) {
+    error.value = "Fehler beim Laden der Daten.";
+    console.error(newsError || tagsError);
   } else {
-    news.value = data;
+    const tagMap = Object.fromEntries(
+      tagsData.map((tag) => [tag.id, tag.name])
+    );
+
+    news.value = newsData.map((article) => {
+      let tagIds = article.tags;
+      if (typeof tagIds === "string") {
+        try {
+          tagIds = JSON.parse(tagIds);
+        } catch {
+          tagIds = [];
+        }
+      }
+      return {
+        ...article,
+        tags: tagIds.map((id) => tagMap[id]).filter(Boolean),
+      };
+    });
   }
 
   loading.value = false;
-  console.log("news: ", news.value[0].tags);
 });
 </script>
 
 <style scoped>
+.news {
+  padding: 1rem;
+}
+
 .news-card {
-  border: 1px solid #000000;
+  border: 1px solid #333;
+  background: #000;
+  color: #fff;
   padding: 1rem;
   margin-bottom: 1rem;
-  background: #000000;
   border-radius: 6px;
 }
+
 .meta {
   font-size: 0.9rem;
-  color: #666;
+  color: #888;
+}
+
+.tags {
+  margin-top: 0.5rem;
+}
+
+.tag {
+  display: inline-block;
+  background: #333;
+  color: #fff;
+  border-radius: 4px;
+  padding: 0.2rem 0.5rem;
+  margin-right: 0.3rem;
+  font-size: 0.8rem;
 }
 </style>
