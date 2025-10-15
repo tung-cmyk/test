@@ -6,16 +6,6 @@
     <div v-else-if="error">{{ error }}</div>
 
     <div v-else>
-      <div class="game-header">
-        <h2>{{ game.name }}</h2>
-        <p><strong>Genre:</strong> {{ game.genre }}</p>
-        <p><strong>Plattformen:</strong> {{ game.platforms }}</p>
-        <p><strong>Release:</strong> {{ game.release_date }}</p>
-        <p><strong>Entwickler:</strong> {{ game.developer }}</p>
-        <p><strong>Publisher:</strong> {{ game.publisher }}</p>
-        <p>{{ game.description }}</p>
-      </div>
-
       <h3 class="section-title">Neuigkeiten zu {{ game.name }}</h3>
       <div v-if="news.length === 0">Keine News gefunden.</div>
       <div v-else class="news-list">
