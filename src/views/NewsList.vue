@@ -2,7 +2,7 @@
   <div class="news">
     <h2>Gaming-News</h2>
 
-    <div v-if="loading">Lade Artikel...</div>
+    <div v-if="loading">Loading content...</div>
     <div v-else-if="error">{{ error }}</div>
 
     <div v-else>
