@@ -1,8 +1,7 @@
 <template>
   <div>
     <NavBar />
-    <h1>Stay Ahead in</h1>
-    <h1>Gaming News</h1>
+    <br />
     <router-view />
   </div>
 </template>

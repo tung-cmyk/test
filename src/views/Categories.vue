@@ -1,31 +1,57 @@
 <template>
   <div class="wrapper">
-    <router-link to="/" class="back-link">⬅️ back</router-link>
-    <h2>Tags</h2>
+    <router-link to="/" class="back-link">⬅️ Zurück</router-link>
+    <h2>Kategorien</h2>
 
-    <div v-if="loading">Loading Tags...</div>
+    <div v-if="loading">Lade Kategorien...</div>
     <div v-else-if="error">{{ error }}</div>
 
-    <div v-else class="categories">
-      <div
-        v-for="(articles, tagName) in categorizedNews"
-        :key="tagName"
-        class="category-block"
-      >
-        <h3 class="category-title">{{ tagName }}</h3>
+    <div v-else>
+      <div class="filter-bar">
+        <button
+          class="filter-btn"
+          :class="{ active: activeTag === null }"
+          @click="activeTag = null"
+        >
+          Alle
+        </button>
+        <button
+          v-for="tagName in Object.keys(categorizedNews)"
+          :key="tagName"
+          class="filter-btn"
+          :class="{ active: activeTag === tagName }"
+          @click="activeTag = tagName"
+        >
+          {{ tagName }}
+        </button>
+      </div>
 
-        <div v-if="articles.length === 0">
-          <p>No acrticles</p>
-        </div>
+      <div class="categories">
+        <div
+          v-for="(articles, tagName) in filteredCategories"
+          :key="tagName"
+          class="category-block"
+        >
+          <h3 class="category-title">{{ tagName }}</h3>
 
-        <div v-else class="news-list">
-          <div v-for="article in articles" :key="article.id" class="news-card">
-            <h4>{{ article.title }}</h4>
-            <p class="meta">
-              created by {{ article.author }} ·
-              {{ article.published_at }}
-            </p>
-            <p>{{ article.content }}</p>
+          <div v-if="articles.length === 0">
+            <p>Keine Artikel vorhanden.</p>
+          </div>
+
+          <div v-else class="news-list">
+            <div
+              v-for="article in articles"
+              :key="article.id"
+              class="news-card"
+            >
+              <h4>{{ article.title }}</h4>
+              <p class="meta">
+                Spiel: <strong>{{ article.game_name }}</strong> · von
+                {{ article.author }} ·
+                {{ article.published_at }}
+              </p>
+              <p>{{ article.content }}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -34,12 +60,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { supabase } from "../supabase.js";
 
+//get the data from supabase
 const loading = ref(true);
 const error = ref(null);
 const categorizedNews = ref({});
+const activeTag = ref(null);
 
 onMounted(async () => {
   try {
@@ -100,6 +128,12 @@ onMounted(async () => {
     loading.value = false;
   }
 });
+
+// Filter if not individual String, if value includes search item value
+const filteredCategories = computed(() => {
+  if (!activeTag.value) return categorizedNews.value;
+  return { [activeTag.value]: categorizedNews.value[activeTag.value] || [] };
+});
 </script>
 
 <style scoped>
@@ -123,6 +157,32 @@ onMounted(async () => {
 }
 .back-link:hover {
   color: var(--color-secondary);
+}
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: var(--gap-md);
+}
+
+.filter-btn {
+  background: var(--color-background-dark);
+  border: 1px solid var(--color-background);
+  border-radius: 8px;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  color: var(--color-text);
+  transition: all 0.2s;
+}
+.filter-btn:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+}
+.filter-btn.active {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
 }
 
 .categories {
