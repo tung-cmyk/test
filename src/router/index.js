@@ -16,6 +16,12 @@ const router = createRouter({
       component: GameDetail,
       props: true,
     },
+    {
+      path: "/categories",
+      name: "Categories",
+      component: () => import("../views/Categories.vue"),
+    },
+
   ],
 });
 

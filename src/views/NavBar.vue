@@ -7,8 +7,7 @@
     <div class="right-section">
       <div class="nav-links">
         <a href="#">News</a>
-        <a href="#">Reviews</a>
-        <a href="#">Categories</a>
+        <router-link to="/categories">Tags</router-link>
       </div>
       <button class="subscribe-button">Subscribe</button>
     </div>

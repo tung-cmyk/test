@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <router-link to="/" class="back-link">⬅️ Zurück</router-link>
+    <router-link to="/" class="back-link">⬅️ back</router-link>
 
     <div v-if="loading">loading content...</div>
     <div v-else-if="error">{{ error }}</div>
@@ -17,7 +17,7 @@
           </p>
 
           <div class="tags">
-            <strong>Tags:</strong>
+            <strong>Tags: </strong>
             <span v-for="tag in article.tags" :key="tag" class="tag">{{
               tag
             }}</span>
