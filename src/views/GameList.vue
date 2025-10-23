@@ -8,24 +8,28 @@
     <div v-else class="news-list">
       <div v-if="news.length === 0">No news found.</div>
 
-      <div v-for="article in news" :key="article.id" class="news-card">
+      <router-link
+        v-for="article in news"
+        :key="article.id"
+        :to="`/game/${article.game_id}/updates`"
+        class="news-card"
+      >
         <h3>{{ article.title }}</h3>
         <p class="meta">
-          created by {{ article.author }} ·
-          {{ article.published_at }}
+          created by {{ article.author }} · {{ article.published_at }}
         </p>
         <p>{{ article.content }}</p>
 
         <div class="tags" v-if="article.tags.length">
-          <strong>Tags:</strong>
+          <strong>Tags: </strong>
           <span v-for="tag in article.tags" :key="tag" class="tag">
             {{ tag }}
           </span>
         </div>
-      </div>
+      </router-link>
     </div>
 
-    <h2>Spiele</h2>
+    <h2>Games</h2>
 
     <div v-if="loadingGames">Lade Spiele...</div>
     <div v-else-if="errorGames">{{ errorGames }}</div>
@@ -85,7 +89,8 @@ onMounted(async () => {
         games ( name )
       `
       )
-      .order("published_at", { ascending: false });
+      .order("published_at", { ascending: false })
+      .limit(3);
 
     if (newsError) throw newsError;
 
@@ -144,6 +149,8 @@ onMounted(async () => {
   border: 1px solid var(--color-background);
   border-radius: var(--border-radius);
   padding: var(--gap-md);
+  text-decoration: none;
+  color: inherit;
   transition: transform 0.2s, border-color 0.2s;
 }
 

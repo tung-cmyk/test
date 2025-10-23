@@ -21,6 +21,12 @@ const router = createRouter({
       name: "Categories",
       component: () => import("../views/Categories.vue"),
     },
+    {
+      path: "/game/:id/updates",
+      name: "GameUpdates",
+      component: () => import("../views/GameUpdates.vue"),
+    },
+
 
   ],
 });
