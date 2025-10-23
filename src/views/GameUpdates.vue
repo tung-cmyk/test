@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <router-link to="/" class="back-link">⬅️ Zurück</router-link>
+    <router-link to="/" class="back-link">⬅️ go back</router-link>
 
     <div v-if="loading">Loading updates...</div>
     <div v-else-if="error">{{ error }}</div>
@@ -101,7 +101,7 @@ onMounted(async () => {
 
 .update-card:hover {
   transform: translateY(-2px);
-  border-color: var(--color-primary);
+  border-color: var(--color-secondary);
 }
 
 .meta {

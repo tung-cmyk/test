@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper">
-    <router-link to="/" class="back-link">⬅️ Zurück</router-link>
-    <h2>Kategorien</h2>
+    <router-link to="/" class="back-link">⬅️ go back</router-link>
+    <h2>Categories</h2>
 
     <div v-if="loading">Lade Kategorien...</div>
     <div v-else-if="error">{{ error }}</div>

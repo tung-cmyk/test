@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <router-link to="/" class="back-link">⬅️ back</router-link>
+    <router-link to="/" class="back-link">⬅️ go back</router-link>
 
     <div v-if="loading">loading content...</div>
     <div v-else-if="error">{{ error }}</div>
