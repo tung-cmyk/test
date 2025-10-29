@@ -41,10 +41,21 @@
         :to="`/game/${game.id}`"
         class="game-card"
       >
-        <h3>{{ game.name }}</h3>
-        <p><strong>Genre:</strong> {{ game.genre }}</p>
-        <p><strong>Release:</strong> {{ game.release_date }}</p>
-        <p><strong>Developer:</strong> {{ game.developer }}</p>
+        <div class="game-image-wrapper" :aria-hidden="true">
+          <img
+            v-if="getImageSrc(game)"
+            :src="getImageSrc(game)"
+            :alt="game.name"
+            class="game-image"
+          />
+        </div>
+
+        <div class="game-info">
+          <h3>{{ game.name }}</h3>
+          <p><strong>Genre:</strong> {{ game.genre }}</p>
+          <p><strong>Release:</strong> {{ game.release_date }}</p>
+          <p><strong>Developer:</strong> {{ game.developer }}</p>
+        </div>
       </router-link>
     </div>
   </div>
@@ -61,6 +72,14 @@ const errorGames = ref(null);
 const news = ref([]);
 const loadingNews = ref(true);
 const errorNews = ref(null);
+
+function getImageSrc(game) {
+  if (!game || !game.image) return null;
+  const val = game.image;
+  {
+    return val;
+  }
+}
 
 onMounted(async () => {
   try {
@@ -143,7 +162,6 @@ onMounted(async () => {
   gap: var(--gap-md);
   margin-bottom: var(--gap-lg);
 }
-
 .news-card {
   background: var(--color-background-dark);
   border: 1px solid var(--color-background);
@@ -153,18 +171,15 @@ onMounted(async () => {
   color: inherit;
   transition: transform 0.2s, border-color 0.2s;
 }
-
 .news-card:hover {
   transform: translateY(-2px);
   border-color: var(--color-primary);
 }
-
 .meta {
   font-size: 0.85rem;
   color: var(--color-muted);
   margin-bottom: 0.5rem;
 }
-
 .tag {
   display: inline-block;
   background: var(--color-primary);
@@ -175,10 +190,6 @@ onMounted(async () => {
   font-size: 0.8rem;
 }
 
-.tag:hover {
-  background: var(--color-primary-hover);
-}
-
 .games {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -186,21 +197,56 @@ onMounted(async () => {
 }
 
 .game-card {
+  position: relative;
   display: block;
+  overflow: hidden;
   border: 1px solid var(--color-background-dark);
-  padding: var(--gap-md);
-  background: var(--color-background-dark);
   border-radius: var(--border-radius);
+  background: var(--color-background-dark);
   color: var(--color-text);
   text-decoration: none;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+}
+.game-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
 }
 
-.game-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-  background: var(--color-primary-hover);
+.game-image-wrapper {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+.game-card:hover .game-image-wrapper {
+  opacity: 1;
+}
+
+.game-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: center;
+  transition: transform 0.45s ease;
+}
+.game-card:hover .game-image {
+  transform: scale(1.05);
+}
+
+.game-info {
+  position: relative;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.6);
+  padding: var(--gap-md);
+  border-radius: var(--border-radius);
+  transition: background 0.3s ease;
+}
+.game-card:hover .game-info {
+  background: rgba(0, 0, 0, 0.45);
 }
 
 @media (max-width: 600px) {

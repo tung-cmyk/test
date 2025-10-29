@@ -129,7 +129,7 @@ onMounted(async () => {
   }
 });
 
-// Filter if not individual String, if value includes search item value
+// if no activeTag selected return all value
 const filteredCategories = computed(() => {
   if (!activeTag.value) return categorizedNews.value;
   return { [activeTag.value]: categorizedNews.value[activeTag.value] || [] };
