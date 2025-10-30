@@ -6,15 +6,23 @@
     </div>
     <div class="right-section">
       <div class="nav-links">
-        <a href="#">News</a>
+        <a href="/">News</a>
         <router-link to="/categories">Tags</router-link>
       </div>
-      <button class="subscribe-button">Subscribe</button>
+      <button class="login-register" @click="goToAuth">Login / Register</button>
     </div>
   </nav>
 </template>
 
-<script setup></script>
+<script setup>
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+function goToAuth() {
+  router.push("/auth");
+}
+</script>
 
 <style scoped>
 .navbar {
@@ -37,11 +45,7 @@
 }
 
 .icon {
-  background: linear-gradient(
-    to right,
-    #a100ff,
-    #00cfff
-  ); /* kannst du auch als Variable setzen */
+  background: linear-gradient(to right, #a100ff, #00cfff);
   color: var(--color-text);
   font-weight: bold;
   font-size: 1rem;
@@ -80,7 +84,7 @@
   color: var(--color-text);
 }
 
-.subscribe-button {
+.login-register {
   background: var(--color-primary);
   color: var(--color-text);
   border: none;
@@ -89,9 +93,10 @@
   font-weight: bold;
   border-radius: var(--border-radius);
   cursor: pointer;
+  transition: background 0.2s ease-in-out;
 }
 
-.subscribe-button:hover {
+.login-register:hover {
   background: var(--color-primary-hover);
 }
 </style>

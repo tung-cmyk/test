@@ -43,8 +43,8 @@
       >
         <div class="game-image-wrapper" :aria-hidden="true">
           <img
-            v-if="getImageSrc(game)"
-            :src="getImageSrc(game)"
+            v-if="game && game.image"
+            :src="game.image"
             :alt="game.name"
             class="game-image"
           />
@@ -72,14 +72,6 @@ const errorGames = ref(null);
 const news = ref([]);
 const loadingNews = ref(true);
 const errorNews = ref(null);
-
-function getImageSrc(game) {
-  if (!game || !game.image) return null;
-  const val = game.image;
-  {
-    return val;
-  }
-}
 
 onMounted(async () => {
   try {

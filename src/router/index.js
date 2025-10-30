@@ -26,8 +26,11 @@ const router = createRouter({
       name: "GameUpdates",
       component: () => import("../views/GameUpdates.vue"),
     },
-
-
+    {
+      path: "/auth",
+      name: "Auth",
+      component: () => import("../views/LoginRegister.vue"),
+    },
   ],
 });
 
