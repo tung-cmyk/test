@@ -38,10 +38,12 @@ const isLogin = ref(true);
 
 async function handleSubmit() {
   try {
+    console.warn("is login", isLogin);
     if (isLogin.value) {
       await login(email.value, password.value);
       alert("Login successful!");
     } else {
+      console.warn("registering");
       await register(email.value, password.value);
       alert("Registration successful! Please verify your email.");
     }
