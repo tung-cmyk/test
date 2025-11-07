@@ -41,7 +41,7 @@ async function handleSubmit() {
     console.warn("is login", isLogin);
     if (isLogin.value) {
       await login(email.value, password.value);
-      alert("Login successful!");
+      alert("Login successful.");
     } else {
       console.warn("registering");
       await register(email.value, password.value);

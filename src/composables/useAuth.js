@@ -1,28 +1,39 @@
-import { ref, onMounted } from "vue";
-import { supabase } from "@/supabase"; 
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { supabase } from "@/supabase";
 
 const user = ref(null);
-let initialized = false;
 
-export function useAuth() {
-  // Initialisiere nur einmal
-  if (!initialized) {
-    initialized = true;
+export function useUserAuth() {
+  const router = useRouter();
 
-    onMounted(async () => {
-      const { data } = await supabase.auth.getUser();
-      user.value = data.user;
+  const getUser = async () => {
+    const { data } = await supabase.auth.getUser();
+    user.value = data?.user || null;
+  };
 
-      supabase.auth.onAuthStateChange((event, session) => {
-        user.value = session?.user ?? null;
-      });
+  supabase.auth.onAuthStateChange((_event, session) => {
+    user.value = session?.user || null;
+
+    // Redirect to home when logged in
+    if (session?.user) {
+      router.push("/");
+    }
+  });
+
+  const login = async (email, password) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
-  }
+    if (error) throw error;
+  };
 
   const logout = async () => {
     await supabase.auth.signOut();
-    user.value = null;
   };
 
-  return { user, logout };
+  getUser();
+
+  return { user, login, logout };
 }
