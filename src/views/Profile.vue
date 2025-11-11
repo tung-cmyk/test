@@ -9,8 +9,6 @@
         <p><strong>Email:</strong> {{ user.email }}</p>
         <p><strong>User ID:</strong> {{ user.id }}</p>
       </div>
-
-      <button class="logout-btn" @click="logout">Logout</button>
     </div>
 
     <div v-else class="loading">Loading your profile...</div>
