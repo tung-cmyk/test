@@ -1,23 +1,20 @@
 <template>
   <nav class="navbar">
-    <!-- Left: Logo -->
     <div class="logo">
       <div class="icon">T</div>
       <span class="brand">GameNews</span>
     </div>
 
-    <!-- Right: Links + Auth -->
     <div class="right-section">
       <div class="nav-links">
         <router-link to="/">Home</router-link>
         <router-link to="/categories">Categories</router-link>
         <router-link v-if="user" to="/profile">Profile</router-link>
-        <!-- 👈 added -->
       </div>
 
       <div class="auth-section">
         <template v-if="user">
-          <span class="user-email">👋 {{ user.email }}</span>
+          <span class="user-email"> {{ user.email }}</span>
           <button class="logout-btn" @click="logout">Logout</button>
         </template>
         <template v-else>

@@ -1,105 +1,335 @@
 <template>
-  <div class="profile-container">
-    <h1 class="title">Your Profile</h1>
+  <div class="profile-page">
+    <!-- User Info Card -->
+    <div class="profile-card">
+      <div class="avatar">👤</div>
+      <h1 class="user-title">User Profile</h1>
 
-    <div class="profile-card" v-if="user">
-      <div class="avatar">{{ initials }}</div>
-
-      <div class="info">
+      <div v-if="user" class="user-info">
         <p><strong>Email:</strong> {{ user.email }}</p>
-        <p><strong>User ID:</strong> {{ user.id }}</p>
+        <p>
+          <strong>Role:</strong>
+          <span :class="['role-badge', role === 'admin' ? 'admin' : 'user']">{{
+            role
+          }}</span>
+        </p>
       </div>
     </div>
 
-    <div v-else class="loading">Loading your profile...</div>
+    <!-- Admin News Section -->
+    <div v-if="role === 'admin'" class="admin-section">
+      <h2 class="section-title">Post News</h2>
+
+      <!-- Add new article -->
+      <div class="card add-news-form">
+        <input v-model="title" placeholder="News title" />
+        <textarea v-model="content" placeholder="Write something..."></textarea>
+        <button class="btn-primary" @click="addArticle">Add Article</button>
+      </div>
+
+      <!-- Edit/Delete existing articles -->
+      <div v-if="newsList.length" class="news-list">
+        <div
+          v-for="article in newsList"
+          :key="article.id"
+          class="card news-item"
+        >
+          <div class="news-header">
+            <h3>{{ article.title }}</h3>
+            <div class="actions">
+              <button class="btn-edit" @click="startEditing(article)">
+                Edit
+              </button>
+              <button class="btn-delete" @click="deleteArticle(article.id)">
+                Delete
+              </button>
+            </div>
+          </div>
+          <p class="news-content">{{ article.content }}</p>
+        </div>
+      </div>
+
+      <!-- Edit form -->
+      <div v-if="editingArticle" class="card edit-form">
+        <h3>Edit Article</h3>
+        <input v-model="editTitle" />
+        <textarea v-model="editContent"></textarea>
+        <div class="edit-actions">
+          <button class="btn-primary" @click="updateArticle">
+            Save Changes
+          </button>
+          <button class="btn-cancel" @click="cancelEdit">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div v-else class="non-admin-message card">
+      <p>You are not an admin — viewing-only mode.</p>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { ref, onMounted } from "vue";
+import { supabase } from "@/supabase";
 import { useUserAuth } from "@/composables/useAuth";
-const { user, logout } = useUserAuth();
 
-const initials = computed(() => {
-  if (!user.value?.email) return "?";
-  return user.value.email.charAt(0).toUpperCase();
-});
+const { user, role } = useUserAuth();
+
+const newsList = ref([]);
+const title = ref("");
+const content = ref("");
+const editingArticle = ref(null);
+const editTitle = ref("");
+const editContent = ref("");
+
+const loadNews = async () => {
+  const { data } = await supabase
+    .from("news")
+    .select("*")
+    .order("created_at", { ascending: false });
+  newsList.value = data || [];
+};
+
+onMounted(loadNews);
+
+const addArticle = async () => {
+  if (role.value !== "admin") return alert("Only admins can add news.");
+  const { error } = await supabase.from("news").insert([
+    {
+      title: title.value,
+      content: content.value,
+      author_id: user.value.id,
+    },
+  ]);
+  if (!error) {
+    title.value = "";
+    content.value = "";
+    loadNews();
+  }
+};
+
+const startEditing = (article) => {
+  editingArticle.value = article;
+  editTitle.value = article.title;
+  editContent.value = article.content;
+};
+
+const cancelEdit = () => {
+  editingArticle.value = null;
+  editTitle.value = "";
+  editContent.value = "";
+};
+
+const updateArticle = async () => {
+  if (!editingArticle.value) return;
+  const { error } = await supabase
+    .from("news")
+    .update({
+      title: editTitle.value,
+      content: editContent.value,
+    })
+    .eq("id", editingArticle.value.id);
+
+  if (!error) {
+    editingArticle.value = null;
+    loadNews();
+  }
+};
+
+const deleteArticle = async (id) => {
+  const { error } = await supabase.from("news").delete().eq("id", id);
+  if (!error) loadNews();
+};
 </script>
 
 <style scoped>
-.profile-container {
-  max-width: 500px;
-  margin: 60px auto;
-  padding: 24px;
-  background: linear-gradient(
-    to bottom right,
-    var(--color-background),
-    var(--color-background-dark)
-  );
+.profile-page {
   color: var(--color-text);
-  border-radius: var(--border-radius);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  text-align: center;
-  font-family: var(--font-main);
-}
-
-.title {
-  font-size: 1.8rem;
-  margin-bottom: 24px;
-  color: var(--color-primary);
-}
-
-.profile-card {
+  padding: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--gap-md);
+  gap: 2rem;
+}
+
+/* Centered Profile Card */
+.profile-card {
+  background: linear-gradient(
+    145deg,
+    var(--color-background-dark),
+    var(--color-background)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius);
+  box-shadow: 0 0 25px rgba(138, 43, 226, 0.3);
+  text-align: center;
+  padding: 2rem 3rem;
+  max-width: 400px;
+  width: 100%;
 }
 
 .avatar {
+  font-size: 3rem;
   background: linear-gradient(
     to right,
     var(--color-primary),
     var(--color-secondary)
   );
-  color: var(--color-text);
-  font-size: 2rem;
-  font-weight: bold;
   width: 80px;
   height: 80px;
   border-radius: 50%;
+  margin: 0 auto 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.info {
-  text-align: left;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 16px;
+.user-title {
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.user-info p {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+}
+
+.role-badge {
+  padding: 4px 10px;
   border-radius: var(--border-radius);
+  text-transform: capitalize;
+  font-weight: 600;
 }
 
-.info p {
-  margin: 6px 0;
-  font-size: var(--font-size-base);
-}
-
-.logout-btn {
-  margin-top: 16px;
+.role-badge.admin {
   background: var(--color-primary);
-  color: var(--color-text);
-  border: none;
-  padding: 10px 20px;
-  border-radius: var(--border-radius);
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.2s ease-in-out, transform 0.1s;
+  color: white;
 }
 
-.logout-btn:hover {
+.role-badge.user {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Admin Section */
+.admin-section {
+  width: 100%;
+  max-width: 800px;
+}
+
+.section-title {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+/* Cards and Forms */
+.card {
+  background: var(--color-background-dark);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.add-news-form,
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.news-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.news-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.news-content {
+  color: var(--color-muted);
+  margin-top: 0.5rem;
+}
+
+.actions,
+.edit-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Inputs & Buttons */
+input,
+textarea {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--border-radius);
+  padding: 10px;
+  font-family: var(--font-main);
+}
+
+textarea {
+  min-height: 80px;
+}
+
+button {
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+  padding: 8px 16px;
+}
+
+.btn-primary:hover {
   background: var(--color-primary-hover);
   transform: translateY(-1px);
+}
+
+.btn-edit {
+  background: var(--color-secondary);
+  color: black;
+  padding: 6px 12px;
+}
+
+.btn-edit:hover {
+  opacity: 0.9;
+}
+
+.btn-delete {
+  background: hsl(0, 70%, 45%);
+  color: white;
+  padding: 6px 12px;
+}
+
+.btn-delete:hover {
+  background: hsl(0, 70%, 55%);
+}
+
+.btn-cancel {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-text);
+  padding: 8px 16px;
+}
+
+.btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.non-admin-message {
+  text-align: center;
+  opacity: 0.8;
+  max-width: 400px;
 }
 </style>
