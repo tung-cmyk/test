@@ -1,6 +1,5 @@
 <template>
   <div class="profile-page">
-    <!-- User Info Card -->
     <div class="profile-card">
       <div class="avatar">👤</div>
       <h1 class="user-title">User Profile</h1>
@@ -8,7 +7,7 @@
       <div v-if="user" class="user-info">
         <p><strong>Email:</strong> {{ user.email }}</p>
         <p>
-          <strong>Role:</strong>
+          <strong>Role: </strong>
           <span :class="['role-badge', role === 'admin' ? 'admin' : 'user']">{{
             role
           }}</span>
@@ -27,7 +26,7 @@
         <button class="btn-primary" @click="addArticle">Add Article</button>
       </div>
 
-      <!-- Edit/Delete existing articles -->
+      <!-- Edit/Delete articles -->
       <div v-if="newsList.length" class="news-list">
         <div
           v-for="article in newsList"
@@ -49,7 +48,6 @@
         </div>
       </div>
 
-      <!-- Edit form -->
       <div v-if="editingArticle" class="card edit-form">
         <h3>Edit Article</h3>
         <input v-model="editTitle" />
@@ -95,17 +93,23 @@ onMounted(loadNews);
 
 const addArticle = async () => {
   if (role.value !== "admin") return alert("Only admins can add news.");
+
   const { error } = await supabase.from("news").insert([
     {
       title: title.value,
       content: content.value,
-      author_id: user.value.id,
+      author: user.value.email,
+      tags: "general",
     },
   ]);
-  if (!error) {
+
+  if (error) {
+    console.error("Error adding news:", error);
+    alert("Error adding news: " + error.message);
+  } else {
     title.value = "";
     content.value = "";
-    loadNews();
+    await loadNews();
   }
 };
 
@@ -146,14 +150,14 @@ const deleteArticle = async (id) => {
 <style scoped>
 .profile-page {
   color: var(--color-text);
-  padding: 2rem;
+  padding: var(--gap-lg);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: var(--gap-lg);
+  font-family: var(--font-main);
 }
 
-/* Centered Profile Card */
 .profile-card {
   background: linear-gradient(
     145deg,
@@ -162,15 +166,15 @@ const deleteArticle = async (id) => {
   );
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--border-radius);
-  box-shadow: 0 0 25px rgba(138, 43, 226, 0.3);
+  box-shadow: 0 0 20px rgba(138, 43, 226, 0.25);
   text-align: center;
-  padding: 2rem 3rem;
+  padding: var(--gap-lg);
   max-width: 400px;
   width: 100%;
 }
 
 .avatar {
-  font-size: 3rem;
+  font-size: 2.8rem;
   background: linear-gradient(
     to right,
     var(--color-primary),
@@ -179,21 +183,21 @@ const deleteArticle = async (id) => {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  margin: 0 auto 1rem;
+  margin: 0 auto var(--gap-md);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .user-title {
-  font-size: 1.6rem;
-  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  margin-bottom: var(--gap-sm);
   font-weight: 600;
 }
 
 .user-info p {
   margin: 0.5rem 0;
-  font-size: 1rem;
+  font-size: var(--font-size-base);
 }
 
 .role-badge {
@@ -205,14 +209,14 @@ const deleteArticle = async (id) => {
 
 .role-badge.admin {
   background: var(--color-primary);
-  color: white;
+  color: var(--color-text);
 }
 
 .role-badge.user {
   background: rgba(255, 255, 255, 0.1);
+  color: var(--color-muted);
 }
 
-/* Admin Section */
 .admin-section {
   width: 100%;
   max-width: 800px;
@@ -220,16 +224,16 @@ const deleteArticle = async (id) => {
 
 .section-title {
   font-size: 1.3rem;
-  margin-bottom: 1rem;
+  margin-bottom: var(--gap-md);
   text-align: left;
+  color: var(--color-primary);
 }
 
-/* Cards and Forms */
 .card {
   background: var(--color-background-dark);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--border-radius);
-  padding: 1.5rem;
+  padding: var(--gap-md);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
@@ -237,13 +241,28 @@ const deleteArticle = async (id) => {
 .edit-form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--gap-sm);
+}
+
+input,
+textarea {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--border-radius);
+  padding: 10px;
+  font-family: var(--font-main);
+  font-size: var(--font-size-base);
+}
+
+textarea {
+  min-height: 80px;
 }
 
 .news-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--gap-md);
 }
 
 .news-header {
@@ -254,28 +273,14 @@ const deleteArticle = async (id) => {
 
 .news-content {
   color: var(--color-muted);
-  margin-top: 0.5rem;
+  margin-top: var(--gap-sm);
+  line-height: 1.5;
 }
 
 .actions,
 .edit-actions {
   display: flex;
-  gap: 0.5rem;
-}
-
-/* Inputs & Buttons */
-input,
-textarea {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--color-text);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--border-radius);
-  padding: 10px;
-  font-family: var(--font-main);
-}
-
-textarea {
-  min-height: 80px;
+  gap: var(--gap-sm);
 }
 
 button {
@@ -284,11 +289,12 @@ button {
   cursor: pointer;
   font-weight: 600;
   transition: background 0.2s ease, transform 0.1s ease;
+  font-family: var(--font-main);
 }
 
 .btn-primary {
   background: var(--color-primary);
-  color: white;
+  color: var(--color-text);
   padding: 8px 16px;
 }
 
@@ -299,7 +305,7 @@ button {
 
 .btn-edit {
   background: var(--color-secondary);
-  color: black;
+  color: var(--color-background);
   padding: 6px 12px;
 }
 
@@ -309,7 +315,7 @@ button {
 
 .btn-delete {
   background: hsl(0, 70%, 45%);
-  color: white;
+  color: var(--color-text);
   padding: 6px 12px;
 }
 
@@ -331,5 +337,8 @@ button {
   text-align: center;
   opacity: 0.8;
   max-width: 400px;
+  background: var(--color-background-dark);
+  border-radius: var(--border-radius);
+  padding: var(--gap-md);
 }
 </style>
