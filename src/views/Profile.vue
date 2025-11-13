@@ -94,7 +94,7 @@ onMounted(loadNews);
 const addArticle = async () => {
   if (role.value !== "admin") return alert("Only admins can add news.");
 
-  const { error } = await supabase.from("news").insert([
+  await supabase.from("news").insert([
     {
       title: title.value,
       content: content.value,
@@ -104,12 +104,12 @@ const addArticle = async () => {
   ]);
 
   if (error) {
-    console.error("Error adding news:", error);
+    console.error(error);
     alert("Error adding news: " + error.message);
   } else {
     title.value = "";
     content.value = "";
-    await loadNews();
+    loadNews();
   }
 };
 
