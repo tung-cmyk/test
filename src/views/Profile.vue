@@ -23,10 +23,17 @@
       <div class="card add-news-form">
         <input v-model="title" placeholder="News title" />
         <textarea v-model="content" placeholder="Write something..."></textarea>
+
+        <!-- TAG INPUT -->
+        <input
+          v-model="tagInput"
+          placeholder="Enter tags separated by comma, e.g. action, update"
+        />
+
         <button class="btn-primary" @click="addArticle">Add Article</button>
       </div>
 
-      <!-- Edit/Delete articles -->
+      <!-- Existing articles -->
       <div v-if="newsList.length" class="news-list">
         <div
           v-for="article in newsList"
@@ -44,10 +51,24 @@
               </button>
             </div>
           </div>
+
           <p class="news-content">{{ article.content }}</p>
+
+          <!-- TAGS LIST -->
+          <div v-if="article.tags.length" class="tag-list">
+            <span
+              class="tag"
+              v-for="tag in article.tags"
+              :key="tag.id"
+              @click="filterByTag(tag.name)"
+            >
+              #{{ tag.name }}
+            </span>
+          </div>
         </div>
       </div>
 
+      <!-- Edit form -->
       <div v-if="editingArticle" class="card edit-form">
         <h3>Edit Article</h3>
         <input v-model="editTitle" />
@@ -77,40 +98,86 @@ const { user, role } = useUserAuth();
 const newsList = ref([]);
 const title = ref("");
 const content = ref("");
+const tagInput = ref(""); // ⭐ NEU
+
 const editingArticle = ref(null);
 const editTitle = ref("");
 const editContent = ref("");
 
+// Load all news including tags
 const loadNews = async () => {
-  const { data } = await supabase
+  const { data: articles } = await supabase
     .from("news")
     .select("*")
     .order("created_at", { ascending: false });
-  newsList.value = data || [];
+
+  for (const a of articles) {
+    const { data: tagLinks } = await supabase
+      .from("tag_links")
+      .select("tag_id, tags(name)")
+      .eq("target_type", "news")
+      .eq("target_id", a.id);
+
+    a.tags = tagLinks?.map((t) => ({ id: t.tag_id, name: t.tags.name })) || [];
+  }
+
+  newsList.value = articles;
 };
 
 onMounted(loadNews);
 
+// Add article with tags
 const addArticle = async () => {
   if (role.value !== "admin") return alert("Only admins can add news.");
 
-  const { error } = await supabase.from("news").insert([
-    {
+  // 1. Insert article
+  const { data: article, error: articleError } = await supabase
+    .from("news")
+    .insert({
       title: title.value,
       content: content.value,
       author: user.value.email,
-      tags: "general",
-    },
-  ]);
+    })
+    .select()
+    .single();
 
-  if (error) {
-    console.error("Error adding news:", error);
-    alert("Error adding news: " + error.message);
-  } else {
-    title.value = "";
-    content.value = "";
-    await loadNews();
+  if (articleError) {
+    console.error(articleError);
+    return alert("Error adding article: " + articleError.message);
   }
+
+  // 2. Extract tags from input
+  const tags = tagInput.value
+    .split(",")
+    .map((t) => t.trim().toLowerCase())
+    .filter((t) => t.length > 0);
+
+  for (const tagName of tags) {
+    // Create tag if not existing
+    const { data: tag, error: tagError } = await supabase
+      .from("tags")
+      .upsert({ name: tagName })
+      .select()
+      .single();
+
+    if (tagError) {
+      console.error("Tag error:", tagError);
+      continue;
+    }
+
+    // Link tag to article
+    await supabase.from("tag_links").insert({
+      tag_id: tag.id,
+      target_id: article.id,
+      target_type: "news",
+    });
+  }
+
+  title.value = "";
+  content.value = "";
+  tagInput.value = "";
+
+  await loadNews();
 };
 
 const startEditing = (article) => {
@@ -127,6 +194,7 @@ const cancelEdit = () => {
 
 const updateArticle = async () => {
   if (!editingArticle.value) return;
+
   const { error } = await supabase
     .from("news")
     .update({
@@ -142,8 +210,14 @@ const updateArticle = async () => {
 };
 
 const deleteArticle = async (id) => {
-  const { error } = await supabase.from("news").delete().eq("id", id);
-  if (!error) loadNews();
+  await supabase.from("tag_links").delete().eq("target_id", id);
+  await supabase.from("news").delete().eq("id", id);
+  loadNews();
+};
+
+// Clicking a tag (optional → später Filter-Seite)
+const filterByTag = (tag) => {
+  alert("Filter by tag: " + tag);
 };
 </script>
 
@@ -340,5 +414,25 @@ button {
   background: var(--color-background-dark);
   border-radius: var(--border-radius);
   padding: var(--gap-md);
+}
+.tag-list {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  padding: 4px 8px;
+  background: rgba(138, 43, 226, 0.2);
+  border: 1px solid rgba(138, 43, 226, 0.4);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 0.85rem;
+}
+
+.tag:hover {
+  background: rgba(138, 43, 226, 0.4);
 }
 </style>

@@ -86,48 +86,49 @@ onMounted(async () => {
   }
 
   try {
+    // 1. Lade News OHNE tags-Spalte
     const { data: newsData, error: newsError } = await supabase
       .from("news")
       .select(
         `
-        id,
-        title,
-        content,
-        author,
-        published_at,
-        tags,
-        game_id,
-        games ( name )
-      `
+      id,
+      title,
+      content,
+      author,
+      published_at,
+      game_id,
+      games ( name )
+    `
       )
       .order("published_at", { ascending: false })
       .limit(3);
 
     if (newsError) throw newsError;
 
-    const { data: tagsData, error: tagsError } = await supabase
-      .from("tags")
-      .select("id, name");
+    // 2. Lade alle Tag-Verknüpfungen für diese news-ids
+    const ids = newsData.map((n) => n.id);
 
-    if (tagsError) throw tagsError;
+    const { data: tagLinks, error: tagLinkError } = await supabase
+      .from("tag_links")
+      .select("target_id, tags(name)")
+      .eq("target_type", "news")
+      .in("target_id", ids);
 
-    const tagMap = Object.fromEntries(tagsData.map((t) => [t.id, t.name]));
+    if (tagLinkError) throw tagLinkError;
 
-    news.value = newsData.map((article) => {
-      let tagIds = article.tags;
-      if (typeof tagIds === "string") {
-        try {
-          tagIds = JSON.parse(tagIds);
-        } catch {
-          tagIds = [];
-        }
-      }
-      return {
-        ...article,
-        tags: tagIds.map((id) => tagMap[id]).filter(Boolean),
-        game_name: article.games?.name || "Unbekanntes Spiel",
-      };
+    // 3. Ordne Tags den News zu
+    const tagMap = {};
+    tagLinks.forEach((link) => {
+      if (!tagMap[link.target_id]) tagMap[link.target_id] = [];
+      tagMap[link.target_id].push(link.tags.name);
     });
+
+    // 4. Setze News + Tags zusammen
+    news.value = newsData.map((article) => ({
+      ...article,
+      tags: tagMap[article.id] || [],
+      game_name: article.games?.name || "Unbekanntes Spiel",
+    }));
   } catch (err) {
     console.error(err);
     errorNews.value = "Fehler beim Laden der News.";
