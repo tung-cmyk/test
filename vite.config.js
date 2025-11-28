@@ -4,19 +4,14 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
-
-
-// https://vite.dev/config/
 export default defineConfig({
-  "scripts": {
-  "build": "vite build",
-  "deploy": "gh-pages -d dist"
-},
-  base: '/test/',
+  base: '/',  
+
   plugins: [
     vue(),
     vueDevTools(),
   ],
+
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
