@@ -75,15 +75,15 @@ onMounted(async () => {
       .from("news")
       .select(
         `
-        id,
-        title,
-        content,
-        author,
-        published_at,
-        tags,
-        game_id,
-        games ( name )
-      `
+    id,
+    title,
+    content,
+    author,
+    published_at,
+    tags,
+    game_id,
+    games: games ( name )
+  `
       )
       .order("published_at", { ascending: false });
 
