@@ -17,6 +17,35 @@
 
     <!-- Admin News Section -->
     <div v-if="role === 'admin'" class="admin-section">
+      <!-- Admin User Management -->
+      <div class="card" style="margin-top: 2rem">
+        <h2 class="section-title">User Management</h2>
+
+        <div v-if="loadingUsers">Loading users...</div>
+
+        <table v-else class="user-table">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr v-for="u in allUsers" :key="u.id">
+              <td>{{ u.email }}</td>
+              <td>
+                <span :class="['role-badge', u.is_admin ? 'admin' : 'user']">
+                  {{ u.is_admin ? "admin" : "user" }}
+                </span>
+              </td>
+              <td>{{ new Date(u.created_at).toLocaleDateString() }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <h2 class="section-title">Post News</h2>
 
       <!-- Add new article -->
@@ -103,6 +132,34 @@ const tagInput = ref(""); // ⭐ NEU
 const editingArticle = ref(null);
 const editTitle = ref("");
 const editContent = ref("");
+
+const allUsers = ref([]);
+const loadingUsers = ref(false);
+
+onMounted(async () => {
+  await loadNews();
+  await loadAllUsers(); // 👈 admin-only
+});
+// Load all users (admin only)
+
+const loadAllUsers = async () => {
+  if (role.value !== "admin") return;
+
+  loadingUsers.value = true;
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, email, is_admin, created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error loading users:", error);
+  } else {
+    allUsers.value = data;
+  }
+
+  loadingUsers.value = false;
+};
 
 // Load all news including tags
 const loadNews = async () => {
@@ -222,6 +279,20 @@ const filterByTag = (tag) => {
 </script>
 
 <style scoped>
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--gap-md);
+  font-size: 0.95rem;
+}
+
+.user-table th,
+.user-table td {
+  text-align: left;
+  padding: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 .profile-page {
   color: var(--color-text);
   padding: var(--gap-lg);

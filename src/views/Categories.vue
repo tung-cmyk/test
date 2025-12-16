@@ -3,7 +3,7 @@
     <router-link to="/" class="back-link">⬅️ go back</router-link>
     <h2>Categories</h2>
 
-    <div v-if="loading">Lade Kategorien...</div>
+    <div v-if="loading">load categories</div>
     <div v-else-if="error">{{ error }}</div>
 
     <div v-else>
@@ -13,7 +13,7 @@
           :class="{ active: activeTag === null }"
           @click="activeTag = null"
         >
-          Alle
+          All
         </button>
         <button
           v-for="tagName in Object.keys(categorizedNews)"
@@ -35,7 +35,7 @@
           <h3 class="category-title">{{ tagName }}</h3>
 
           <div v-if="articles.length === 0">
-            <p>Keine Artikel vorhanden.</p>
+            <p>No articles available.</p>
           </div>
 
           <div v-else class="news-list">
@@ -46,7 +46,7 @@
             >
               <h4>{{ article.title }}</h4>
               <p class="meta">
-                Spiel: <strong>{{ article.game_name }}</strong> · von
+                game: <strong>{{ article.game_name }}</strong> · by
                 {{ article.author }} ·
                 {{ article.published_at }}
               </p>
