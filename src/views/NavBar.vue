@@ -12,6 +12,16 @@
         <router-link v-if="user" to="/profile">Profile</router-link>
       </div>
 
+      <!-- 🌙 THEME SWITCH -->
+      <button
+        class="theme-switch"
+        :class="{ dark: theme === 'dark' }"
+        @click="toggleTheme"
+        aria-label="Toggle dark mode"
+      >
+        <span class="switch-thumb"></span>
+      </button>
+
       <div class="auth-section">
         <template v-if="user">
           <span class="user-email"> {{ user.email }}</span>
@@ -28,6 +38,24 @@
 <script setup>
 import { useRouter } from "vue-router";
 import { useUserAuth } from "@/composables/useAuth";
+import { ref, onMounted } from "vue";
+
+const theme = ref("light");
+
+onMounted(() => {
+  const saved = localStorage.getItem("theme");
+  if (saved) {
+    theme.value = saved;
+    document.documentElement.setAttribute("data-theme", saved);
+  }
+});
+
+function toggleTheme() {
+  theme.value = theme.value === "light" ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", theme.value);
+  localStorage.setItem("theme", theme.value);
+}
+
 const { user, logout } = useUserAuth();
 
 const router = useRouter();
@@ -37,6 +65,43 @@ function goToAuth() {
 </script>
 
 <style scoped>
+/* THEME SWITCH */
+.theme-switch {
+  width: 44px;
+  height: 24px;
+  background: var(--color-background-dark);
+  border: 1px solid var(--color-muted);
+  border-radius: 999px;
+  position: relative;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s ease;
+}
+
+.switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  background: var(--color-text);
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+}
+
+/* DARK STATE */
+.theme-switch.dark {
+  background: linear-gradient(
+    to right,
+    var(--color-primary),
+    var(--color-secondary)
+  );
+}
+
+.theme-switch.dark .switch-thumb {
+  transform: translateX(20px);
+}
+
 .navbar {
   display: flex;
   align-items: center;
