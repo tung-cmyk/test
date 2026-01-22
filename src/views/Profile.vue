@@ -29,18 +29,32 @@
               <th>Email</th>
               <th>Role</th>
               <th>Created</th>
+              <th>Actions</th>
             </tr>
           </thead>
 
           <tbody>
             <tr v-for="u in allUsers" :key="u.id">
               <td>{{ u.email }}</td>
+
               <td>
                 <span :class="['role-badge', u.is_admin ? 'admin' : 'user']">
                   {{ u.is_admin ? "admin" : "user" }}
                 </span>
               </td>
+
               <td>{{ new Date(u.created_at).toLocaleDateString() }}</td>
+
+              <td>
+                <button
+                  class="btn-delete"
+                  @click="deleteUser(u.id)"
+                  :disabled="u.id === user?.id"
+                  title="You cannot delete your own account"
+                >
+                  Delete
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -121,6 +135,26 @@
 import { ref, onMounted } from "vue";
 import { supabase } from "@/supabase";
 import { useUserAuth } from "@/composables/useAuth";
+
+const deleteUser = async (userId) => {
+  if (!confirm("Delete this user permanently?")) return;
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  await fetch(
+    "https://niydeuqqyaszdhlruruo.supabase.co/functions/v1/delete-account",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ user_id: userId }),
+    },
+  );
+};
 
 const { user, role } = useUserAuth();
 
@@ -433,7 +467,9 @@ button {
   border-radius: var(--border-radius);
   cursor: pointer;
   font-weight: 600;
-  transition: background 0.2s ease, transform 0.1s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.1s ease;
   font-family: var(--font-main);
 }
 
