@@ -2,7 +2,7 @@
   <nav class="navbar">
     <div class="logo">
       <div class="icon">T</div>
-      <span class="brand">GameNews</span>
+      <router-link to="/"><span class="brand">GameNews</span></router-link>
     </div>
 
     <div class="right-section">
@@ -65,6 +65,14 @@ function goToAuth() {
 </script>
 
 <style scoped>
+.brand {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.logo a {
+  text-decoration: none;
+}
 /* THEME SWITCH */
 .theme-switch {
   width: 44px;
@@ -191,7 +199,9 @@ function goToAuth() {
   font-weight: bold;
   border-radius: var(--border-radius);
   cursor: pointer;
-  transition: background 0.2s ease-in-out, transform 0.1s;
+  transition:
+    background 0.2s ease-in-out,
+    transform 0.1s;
 }
 
 .login-btn:hover,
